@@ -1,18 +1,13 @@
 package ecommercemicroservices.order.model;
 
 import jakarta.persistence.*;
-import lombok.Setter;
-import lombok.Getter;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-
+import lombok.*;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.List;
 
 @Entity
-@Table("orders")
+@Table("`tb_orders")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data

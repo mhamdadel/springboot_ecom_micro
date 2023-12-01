@@ -7,7 +7,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.math.BigDecimal;
 
 @Entity
-@Table("order_items")
+@Table("`tb_order_items`")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data

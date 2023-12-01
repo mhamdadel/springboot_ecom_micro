@@ -21,3 +21,44 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+redis:
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+  elasticsearch:
+    image: "docker.elastic.co/elasticsearch/elasticsearch:7.10.0"
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+
+  mongo:
+    image: "mongo:latest"
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+
+  mysql:
+    image: "mysql:latest"
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: mohamed
+      MYSQL_DATABASE: mohameddatabase
+      MYSQL_USER: mohamedadel
+      MYSQL_PASSWORD: mohamedadel
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+volumes:
+  rabbitmq-data:
+  redis-data:
+  elasticsearch-data:
+  mongodb-data:
+  mysql-data:
