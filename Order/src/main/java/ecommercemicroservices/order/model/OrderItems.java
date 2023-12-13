@@ -2,17 +2,14 @@ package ecommercemicroservices.order.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.relational.core.mapping.Table;
 
 import java.math.BigDecimal;
 
 @Entity
-@Table("`tb_order_items`")
+@Table(name = "tb_order_items")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Getter
-@Setter
 public class OrderItems {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

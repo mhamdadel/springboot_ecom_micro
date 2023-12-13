@@ -2,12 +2,11 @@ package ecommercemicroservices.order.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.List;
 
 @Entity
-@Table("`tb_orders")
+@Table(name = "tb_orders")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data

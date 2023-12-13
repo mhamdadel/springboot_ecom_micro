@@ -1,64 +1,57 @@
-version: '2'
+version: '3'
+
 services:
   zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
+    image: wurstmeister/zookeeper
+    container_name: zookeeper
     ports:
-      - 22181:2181
-
+      - "2181:2181"
   kafka:
-    image: confluentinc/cp-kafka:latest
-    depends_on:
-      - zookeeper
+    image: wurstmeister/kafka
+    container_name: kafka
     ports:
-      - 29092:29092
+      - "9092:9092"
     environment:
-      KAFKA_BROKER_ID: 1
+      KAFKA_ADVERTISED_HOST_NAME: localhost
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-redis:
-    image: "redis:latest"
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis-data:/data
+#  redis:
+#    image: "redis:latest"
+#    ports:
+#      - "6379:6379"
+#    volumes:
+#      - redis-data:/data
+#
+#  elasticsearch:
+#    image: "docker.elastic.co/elasticsearch/elasticsearch:7.10.0"
+#    environment:
+#      - discovery.type=single-node
+#    ports:
+#      - "9200:9200"
+#    volumes:
+#      - elasticsearch-data:/usr/share/elasticsearch/data
+#
+#  mongo:
+#    image: "mongo:latest"
+#    ports:
+#      - "27017:27017"
+#    volumes:
+#      - mongodb-data:/data/db
+#
+#  mysql:
+#    image: "mysql:latest"
+#    ports:
+#      - "3306:3306"
+#    environment:
+#      MYSQL_ROOT_PASSWORD: mohamed
+#      MYSQL_DATABASE: mohameddatabase
+#      MYSQL_USER: mohamedadel
+#      MYSQL_PASSWORD: mohamedadel
+#    volumes:
+#      - mysql-data:/var/lib/mysql
 
-  elasticsearch:
-    image: "docker.elastic.co/elasticsearch/elasticsearch:7.10.0"
-    environment:
-      - discovery.type=single-node
-    ports:
-      - "9200:9200"
-    volumes:
-      - elasticsearch-data:/usr/share/elasticsearch/data
-
-  mongo:
-    image: "mongo:latest"
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodb-data:/data/db
-
-  mysql:
-    image: "mysql:latest"
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: mohamed
-      MYSQL_DATABASE: mohameddatabase
-      MYSQL_USER: mohamedadel
-      MYSQL_PASSWORD: mohamedadel
-    volumes:
-      - mysql-data:/var/lib/mysql
-
-volumes:
-  rabbitmq-data:
-  redis-data:
-  elasticsearch-data:
-  mongodb-data:
-  mysql-data:
+#volumes:
+#  rabbitmq-data:
+#  redis-data:
+#  elasticsearch-data:
+#  mongodb-data:
+#  mysql-data:
