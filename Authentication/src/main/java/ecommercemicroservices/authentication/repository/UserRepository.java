@@ -1,12 +1,13 @@
 package ecommercemicroservices.authentication.repository;
 
-import ecommercemicroservices.authentication.model.User;
+import ecommercemicroservices.authentication.model.CustomUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository(value = "userRepository")
-public interface UserRepository extends JpaRepository<User, Integer> {
-    Optional<User> findByEmail(String email);
+@Repository
+public interface UserRepository extends JpaRepository<CustomUser, Integer> {
+
+    Optional<CustomUser> findByEmail(String email);
 }

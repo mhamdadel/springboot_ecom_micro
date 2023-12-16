@@ -33,13 +33,13 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         Map<String, Object> errorDetails = new HashMap<>();
 
         try {
-            String accessToken = jwtUtil.resolveToken(request);
+            String accessToken = jwtUtil.resolveToken((javax.servlet.http.HttpServletRequest) request);
             if (accessToken == null ) {
                 filterChain.doFilter(request, response);
                 return;
             }
             System.out.println("token : "+accessToken);
-            Claims claims = jwtUtil.resolveClaims(request);
+            Claims claims = jwtUtil.resolveClaims((javax.servlet.http.HttpServletRequest) request);
 
             if(claims != null & jwtUtil.validateClaims(claims)){
                 String email = claims.getSubject();

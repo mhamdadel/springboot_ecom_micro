@@ -1,3 +1,5 @@
+server:
+  port: 8081
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/ecommercemicroservices_authentication
@@ -12,3 +14,10 @@ spring:
 
 jwt:
   secret: "MuhammedSecretKey"
+
+logging:
+ level:
+  org:
+   hibernate: DEBUG
+
+debug: true

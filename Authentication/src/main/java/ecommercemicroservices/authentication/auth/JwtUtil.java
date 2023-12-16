@@ -1,10 +1,10 @@
 package ecommercemicroservices.authentication.auth;
 
-import ecommercemicroservices.authentication.model.User;
+import ecommercemicroservices.authentication.model.CustomUser;
 import io.jsonwebtoken.*;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.AuthenticationException;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -25,7 +25,7 @@ public class JwtUtil {
         this.jwtParser = Jwts.parser().setSigningKey(secret_key);
     }
 
-    public String createToken(User user) {
+    public String createToken(CustomUser user) {
         Claims claims = Jwts.claims().setSubject(user.getEmail());
         claims.put("firstName",user.getFirstName());
         claims.put("lastName",user.getLastName());
