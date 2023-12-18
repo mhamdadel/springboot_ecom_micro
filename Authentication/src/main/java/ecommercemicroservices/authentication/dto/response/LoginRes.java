@@ -1,10 +1,12 @@
 package ecommercemicroservices.authentication.dto.response;
 
+import org.springframework.security.core.Authentication;
+
 public class LoginRes {
     private String email;
-    private String token;
+    private Authentication token;
 
-    public LoginRes(String email, String token) {
+    public LoginRes(String email, Authentication token) {
         this.email = email;
         this.token = token;
     }
@@ -17,11 +19,11 @@ public class LoginRes {
         this.email = email;
     }
 
-    public String getToken() {
+    public Authentication getToken() {
         return token;
     }
 
-    public void setToken(String token) {
+    public void setToken(Authentication token) {
         this.token = token;
     }
 }

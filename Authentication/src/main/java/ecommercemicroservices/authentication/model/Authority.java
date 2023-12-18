@@ -1,17 +1,18 @@
 package ecommercemicroservices.authentication.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.util.Assert;
 
 import java.util.Set;
 
 @Entity
 @Table(name = "auth_authorities")
-@Getter
-@Setter
+@Data
 public class Authority implements GrantedAuthority {
+
+    private static final long serialVersionUID = 620L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,13 +20,23 @@ public class Authority implements GrantedAuthority {
 
     private String name;
 
-    private boolean role;
+    private String role;
 
     @ManyToMany(mappedBy = "authorities")
     private Set<CustomUser> users;
 
-    @Override
-    public String getAuthority() {
-        return this.getName();
+
+    public Authority(String role) {
+        Assert.hasText(role, "A granted authority textual representation is required");
+        this.role = role;
     }
+
+    public Authority() {
+
+    }
+
+    public String getAuthority() {
+        return this.role;
+    }
+
 }

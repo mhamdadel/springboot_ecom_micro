@@ -29,6 +29,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
                         url = "mhamdadel.github.io/index"
                 )
         )
+
 )
 public class AuthenticationApplication {
     public static void main(String[] args) {

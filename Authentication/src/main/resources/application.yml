@@ -20,4 +20,4 @@ logging:
   org:
    hibernate: DEBUG
 
-debug: true
+#debug: true

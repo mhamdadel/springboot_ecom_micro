@@ -5,15 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -83,7 +79,7 @@ public class CustomUser implements UserDetails {
         this.password = customUser.getPassword();
         this.firstName = customUser.getFirstName();
         this.lastName = customUser.getLastName();
-        this.authorities = (Set<Authority>) customUser.getAuthorities();
+        this.authorities = customUser.getAuthorities();
         this.accountNonExpired = customUser.isAccountNonExpired();
         this.accountNonLocked = customUser.isAccountNonLocked();
         this.credentialsNonExpired = customUser.isCredentialsNonExpired();
@@ -92,19 +88,16 @@ public class CustomUser implements UserDetails {
 
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
+    public Set<Authority> getAuthorities() {
         Set<Authority> authorities = this.authorities;
-        List<GrantedAuthority> roleList = new ArrayList<>();
+        Set<Authority> roleSet = new HashSet<>();
 
         for (var a : authorities) {
-            if (a.isRole()) {
-                roleList.add(new SimpleGrantedAuthority("ROLE_" + a.getName()));
-            } else {
-                roleList.add(new SimpleGrantedAuthority(a.getName()));
-            }
+            roleSet.add(new Authority("ROLE_" + a.getName()));
         }
-        return roleList;
+        return roleSet;
     }
+
 
     @Override
     public String getUsername() {
