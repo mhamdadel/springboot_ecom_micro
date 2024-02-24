@@ -1,14 +1,11 @@
 package ecommercemicroservices.authentication.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,40 +13,34 @@ import java.util.Set;
 @Table(name = "auth_users")
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 public class CustomUser implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Getter
-    @Setter
     private Long id;
 
     @Column(unique = true, nullable = false)
     @NotNull(message = "Email cannot be null")
     @Size(min = 1, max = 255, message = "Email length must be between 1 and 255 characters")
-    @Getter
-    @Setter
     private String email;
 
     @Column(nullable = false)
     @NotNull(message = "Password cannot be null")
     @Size(min = 1, max = 255, message = "Password length must be between 1 and 255 characters")
-    @Getter
-    @Setter
     private String password;
 
     @Size(max = 255, message = "First name length must be less than or equal to 255 characters")
-    @Getter
-    @Setter
     private String firstName;
 
+    @Size(max = 255, message = "First name length must be less than or equal to 255 characters")
+    private String username;
+
     @Size(max = 255, message = "Last name length must be less than or equal to 255 characters")
-    @Getter
-    @Setter
     private String lastName;
 
     @ManyToMany
-    @JoinTable(name="users_authorities",
+    @JoinTable(
             joinColumns=
             @JoinColumn(name="user_id", referencedColumnName="id"),
             inverseJoinColumns=
@@ -57,20 +48,12 @@ public class CustomUser implements UserDetails {
     )
     private Set<Authority> authorities;
 
-    @Getter
-    @Setter
     private boolean accountNonExpired;
 
-    @Getter
-    @Setter
     private boolean accountNonLocked;
 
-    @Getter
-    @Setter
     private boolean credentialsNonExpired;
 
-    @Getter
-    @Setter
     private boolean enabled;
 
     public CustomUser(CustomUser customUser) {
@@ -103,6 +86,13 @@ public class CustomUser implements UserDetails {
     public String getUsername() {
         return this.email;
     }
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
+    )
+    private Set<Role> roles;
 
 
 }

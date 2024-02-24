@@ -1,11 +1,8 @@
 package ecommercemicroservices.authentication.config;
 
-import ecommercemicroservices.authentication.service.CustomUserDetailsService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -27,29 +24,17 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class SecurityConfig {
 
     @Bean
-    public WebMvcConfigurer cors() {
+    public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("./**")
-                        .allowedOrigins("*")
-                        .allowedHeaders(HttpHeaders.CONTENT_TYPE, "X-CSRF-TOKEN")
-                        .allowedMethods(HttpMethod.GET.name(), HttpMethod.POST.name())
+                registry.addMapping("/api/**") // Apply CORS configuration to all endpoints under /api
+                        .allowedOriginPatterns("*") // Replace with your allowed origin(s)
+                        .allowedMethods("*")
+                        .allowedHeaders("*")
                         .allowCredentials(true);
             }
         };
-    }
-
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
-
-    @Autowired
-    public void ConfigureGlobal(AuthenticationManagerBuilder auth) throws Exception{
-        auth.userDetailsService(userDetailsService);
-    }
-
-    public void ConfigureGlobal(CustomUserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
     }
 
     @Bean
@@ -70,7 +55,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(customizer -> customizer.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
                 .authorizeHttpRequests(reqs ->
-                        reqs.requestMatchers(HttpMethod.POST, "/rest/auth/**").permitAll()
+                        reqs.requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
                                 .requestMatchers(
                                         "/v3/api-docs/**",
                                         "/swagger-ui/**",
@@ -84,4 +69,25 @@ public class SecurityConfig {
                 );
         return httpSecurity.build();
     }
+
+
+
+    //    @Bean
+
+//    public UserDetailsService userDetailsService(){
+//
+//        UserDetails ramesh = User.builder()
+//                .username("ramesh")
+//                .password(passwordEncoder().encode("password"))
+//                .roles("USER")
+//                .build();
+//
+//        UserDetails admin = User.builder()
+//                .username("admin")
+//                .password(passwordEncoder().encode("admin"))
+//                .roles("ADMIN")
+//                .build();
+//
+//        return new InMemoryUserDetailsManager(ramesh, admin);
+//    }
 }

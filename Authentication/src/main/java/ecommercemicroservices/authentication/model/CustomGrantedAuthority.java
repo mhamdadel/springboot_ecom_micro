@@ -9,14 +9,18 @@ import jakarta.persistence.*;
 @Data
 @Entity
 @Table(name = "auth_granted_authorities")
-@AllArgsConstructor
-@NoArgsConstructor
 public class CustomGrantedAuthority implements GrantedAuthority {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Setter
     private Long id;
 
-    @Setter
     private String authority;
+
+    public CustomGrantedAuthority(String authority) {
+        this.authority = authority;
+    }
+
+    public CustomGrantedAuthority() {
+        
+    }
 }

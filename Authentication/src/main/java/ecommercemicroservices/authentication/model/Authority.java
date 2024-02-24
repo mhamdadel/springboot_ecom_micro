@@ -8,7 +8,7 @@ import org.springframework.util.Assert;
 import java.util.Set;
 
 @Entity
-@Table(name = "auth_authorities")
+// @Table(name = "users_authorities")
 @Data
 public class Authority implements GrantedAuthority {
 
@@ -16,7 +16,7 @@ public class Authority implements GrantedAuthority {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     private String name;
 

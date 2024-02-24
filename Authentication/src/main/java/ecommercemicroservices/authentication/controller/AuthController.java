@@ -2,106 +2,73 @@ package ecommercemicroservices.authentication.controller;
 
 import ecommercemicroservices.authentication.dto.request.LoginReq;
 import ecommercemicroservices.authentication.dto.request.RegisterReq;
-import ecommercemicroservices.authentication.dto.response.ErrorRes;
 import ecommercemicroservices.authentication.dto.response.LoginRes;
 import ecommercemicroservices.authentication.dto.response.RegisterRes;
+import ecommercemicroservices.authentication.error.exceptions.UnauthorizedException;
 import ecommercemicroservices.authentication.model.CustomUser;
+import ecommercemicroservices.authentication.repository.UserRepository;
 import ecommercemicroservices.authentication.service.AuthService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.context.SecurityContextRepository;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Collections;
-import java.util.HashSet;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/rest/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
-    @Value("${jwt.secret}")
-    private String jwtSecret;
+@Value("${jwt.secret}")
+private String jwtSecret;
+
     private final AuthService authService;
     private final AuthenticationManager authenticationManager;
-    private final SecurityContextRepository repository;
 
     @Autowired
-    public AuthController(AuthService authService, AuthenticationManager authenticationManager,
-                          SecurityContextRepository repository) {
+    private UserRepository userRepository;
+
+    @Autowired
+    public AuthController(AuthService authService, AuthenticationManager authenticationManager) {
         this.authService = authService;
         this.authenticationManager = authenticationManager;
-        this.repository = repository;
     }
 
-    @ResponseBody
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseEntity login(@RequestBody LoginReq loginReq, HttpServletRequest req, HttpServletResponse res) {
-
+    @PostMapping("/login")
+    public ResponseEntity<LoginRes> login(@RequestBody LoginReq loginReq) {
         try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginReq.getEmail(), loginReq.getPassword(), new HashSet<GrantedAuthority>())
+            String usernameOrEmail = loginReq.getUsername() != null ? loginReq.getUsername() : loginReq.getEmail();
+            System.out.println(usernameOrEmail);
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(usernameOrEmail, loginReq.getPassword())
             );
-            String email = authentication.getName();
-//            String token = Jwts.builder()
-//                    .setSubject(email)
-//                    .signWith(SignatureAlgorithm.HS256, jwtSecret)
-//                    .compact();
-
-            LoginRes loginRes = new LoginRes(email, authentication);
-
-            SecurityContext context = SecurityContextHolder.getContext();
-            System.out.println("Yes");
-            context.setAuthentication(new UsernamePasswordAuthenticationToken(loginReq, null, Collections.emptySet()));
-            repository.saveContext(context, req, res);
-
-            return ResponseEntity.ok(loginRes);
-
+            String token = Jwts.builder()
+                    .setSubject(usernameOrEmail)
+                    .signWith(SignatureAlgorithm.HS256, jwtSecret)
+                    .compact();
+            return ResponseEntity.ok(new LoginRes(usernameOrEmail, token));
         } catch (BadCredentialsException e) {
-            ErrorRes errorResponse = new ErrorRes(HttpStatus.UNAUTHORIZED, e.getMessage() + "Invalid username or password");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
-        } catch (Exception e) {
-            ErrorRes errorResponse = new ErrorRes(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+            throw new UnauthorizedException("Invalid username or password" + e.getMessage());
         }
     }
 
-
-    @ResponseBody
-    @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public ResponseEntity register(@RequestBody RegisterReq registerReq, HttpServletRequest req, HttpServletResponse res) {
-
+    @PostMapping("/register")
+    public ResponseEntity<RegisterRes> register(@RequestBody RegisterReq registerReq) {
         try {
             CustomUser newUser = authService.register(registerReq);
-
-            String email = newUser.getEmail();
             String token = Jwts.builder()
-                    .setSubject(email)
+                    .setSubject(newUser.getEmail())
                     .signWith(SignatureAlgorithm.HS256, jwtSecret)
                     .compact();
-
-            SecurityContext context = SecurityContextHolder.getContext();
-            context.setAuthentication(new UsernamePasswordAuthenticationToken(newUser, null, Collections.emptyList()));
-            repository.saveContext(context, req, res);
-
-            RegisterRes registerRes = new RegisterRes(email, token);
-            return ResponseEntity.ok(registerRes);
-
+            return ResponseEntity.ok(new RegisterRes(newUser.getEmail(), token));
         } catch (Exception e) {
-            ErrorRes errorResponse = new ErrorRes(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+            throw new RuntimeException("Registration failed: User with this email already exists || " + e.getMessage());
         }
     }
 }
