@@ -7,11 +7,19 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import ecommercemicroservices.authentication.error.exceptions.*;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.Date;
 
 @RestControllerAdvice
 public class ErrorHandling {
+    @ExceptionHandler({NoHandlerFoundException.class})
+    public ResponseEntity<ErrorResponse> handleNoHandlerFoundException(
+            NoHandlerFoundException ex, WebRequest request) {
+        ErrorResponse errorDetails = new ErrorResponse(new Date(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
+    }
+
     @ExceptionHandler(UnauthorizedException.class)
     public final ResponseEntity<ErrorResponse> handleUnauthorizedException(UnauthorizedException ex, WebRequest request) {
         ErrorResponse errorDetails = new ErrorResponse(new Date(), ex.getMessage(), request.getDescription(false));

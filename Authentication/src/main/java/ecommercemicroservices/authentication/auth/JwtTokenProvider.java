@@ -34,8 +34,6 @@ public class JwtTokenProvider {
                 .setExpiration(expireDate)
                 .signWith(SignatureAlgorithm.HS512, key())
                 .compact();
-
-
         return token;
     }
 

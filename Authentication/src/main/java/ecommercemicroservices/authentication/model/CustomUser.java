@@ -14,6 +14,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Builder
 public class CustomUser implements UserDetails {
 
     @Id
@@ -69,7 +70,12 @@ public class CustomUser implements UserDetails {
         this.enabled = customUser.isEnabled();
     }
 
-
+    public Set<Role> getRoles() {
+        if (roles == null) {
+            roles = new HashSet<>();
+        }
+        return roles;
+    }
     @Override
     public Set<Authority> getAuthorities() {
         Set<Authority> authorities = this.authorities;
