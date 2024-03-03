@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 @RestController
-@RequestMapping("sso-auth-server")
+@RequestMapping("api/sso-auth-server")
 public class JwkSetRestController {
 
     @Autowired

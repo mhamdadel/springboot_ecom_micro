@@ -28,7 +28,7 @@ spring:
           authblabla2:
             issuer-uri: http://localhost:8086/auth-server
   application:
-    name: Authentication-Service
+    name: authentication-service
 
 
 app:
@@ -43,9 +43,9 @@ logging:
   org:
    hibernate: DEBUG
 
-#eureka:
-#  client:
-#    serviceUrl:
-#      defaultZone: http://localhost:8761/eureka/
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
 
 #debug: true
