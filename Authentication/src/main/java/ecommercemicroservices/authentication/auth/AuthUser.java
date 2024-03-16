@@ -1,7 +1,7 @@
 package ecommercemicroservices.authentication.auth;
 
-import ecommercemicroservices.authentication.model.Authority;
 import ecommercemicroservices.authentication.model.CustomUser;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Set;
@@ -29,7 +29,7 @@ public class AuthUser extends CustomUser implements UserDetails {
     }
 
     @Override
-    public Set<Authority> getAuthorities() {
+    public Set<SimpleGrantedAuthority> getAuthorities() {
         return null;
 
     }

@@ -2,12 +2,15 @@ package ecommercemicroservices.authentication.service;
 
 import ecommercemicroservices.authentication.dto.request.RegisterReq;
 import ecommercemicroservices.authentication.model.CustomUser;
+import ecommercemicroservices.authentication.model.Role;
+import ecommercemicroservices.authentication.repository.RoleRepository;
 import ecommercemicroservices.authentication.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -16,21 +19,33 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
-@Service("authService")
+@Service
 public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     private final UserRepository userRepository;
+
+    private final RoleRepository roleRepository;
+
+    private final JwtService jwtService;
+
     private static final Logger log = LoggerFactory.getLogger(AuthService.class);
-    @Autowired
+
     private JwtEncoder jwtEncoder;
 
+    @Value("${app.defaults.role}")
+    private String defaultUserRole;
+
     @Autowired
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository, JwtEncoder jwtEncoder, JwtService jwtService) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.jwtEncoder = jwtEncoder;
+        this.jwtService = jwtService;
     }
 
 
@@ -40,7 +55,7 @@ public class AuthService {
 
         String scope = authentication.getAuthorities()
                 .stream()
-                .map(authority -> ((SimpleGrantedAuthority) authority).getAuthority())
+                .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(" "));
 
 
@@ -66,6 +81,17 @@ public class AuthService {
         newUser.setUsername(registerReq.getUsername());;
         newUser.setFirstName(registerReq.getFirstName());
         newUser.setLastName(registerReq.getLastName());
+        newUser.setEnabled(true);
+        newUser.setAccountNonExpired(true);
+        newUser.setCredentialsNonExpired(true);
+        newUser.setAccountNonLocked(true);
+
+        Role defaultRole = roleRepository.findByName(defaultUserRole);
+        if (defaultRole == null) {
+            throw new RuntimeException("Default role not found");
+        }
+
+        newUser.setRoles(Collections.singleton(defaultRole));
 
         userRepository.save(newUser);
 

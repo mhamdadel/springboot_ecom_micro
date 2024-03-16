@@ -10,7 +10,7 @@ import javax.validation.constraints.Size;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<CustomUser, Integer> {
+public interface UserRepository extends JpaRepository<CustomUser, Long> {
 
     Optional<CustomUser> findByEmail(String email);
     @Query("SELECT u FROM CustomUser u WHERE u.username = ?1 or u.email = ?2")

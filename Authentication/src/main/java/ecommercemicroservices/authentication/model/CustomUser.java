@@ -1,11 +1,19 @@
 package ecommercemicroservices.authentication.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,6 +37,7 @@ public class CustomUser implements UserDetails {
     @Column(nullable = false)
     @NotNull(message = "Password cannot be null")
     @Size(min = 1, max = 255, message = "Password length must be between 1 and 255 characters")
+    @JsonIgnore
     private String password;
 
     @Size(max = 255, message = "First name length must be less than or equal to 255 characters")
@@ -40,15 +49,6 @@ public class CustomUser implements UserDetails {
     @Size(max = 255, message = "Last name length must be less than or equal to 255 characters")
     private String lastName;
 
-    @ManyToMany
-    @JoinTable(
-            joinColumns=
-            @JoinColumn(name="user_id", referencedColumnName="id"),
-            inverseJoinColumns=
-            @JoinColumn(name="authority_id", referencedColumnName="id")
-    )
-    private Set<Authority> authorities;
-
     private boolean accountNonExpired;
 
     private boolean accountNonLocked;
@@ -57,48 +57,33 @@ public class CustomUser implements UserDetails {
 
     private boolean enabled;
 
-    public CustomUser(CustomUser customUser) {
-        this.id = customUser.getId();
-        this.email = customUser.getEmail();
-        this.password = customUser.getPassword();
-        this.firstName = customUser.getFirstName();
-        this.lastName = customUser.getLastName();
-        this.authorities = customUser.getAuthorities();
-        this.accountNonExpired = customUser.isAccountNonExpired();
-        this.accountNonLocked = customUser.isAccountNonLocked();
-        this.credentialsNonExpired = customUser.isCredentialsNonExpired();
-        this.enabled = customUser.isEnabled();
-    }
+    @CreationTimestamp
+    private Date createdAt;
 
-    public Set<Role> getRoles() {
-        if (roles == null) {
-            roles = new HashSet<>();
-        }
-        return roles;
-    }
+    @UpdateTimestamp
+    private Date updatedAt;
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "auth_user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles;
+
     @Override
-    public Set<Authority> getAuthorities() {
-        Set<Authority> authorities = this.authorities;
-        Set<Authority> roleSet = new HashSet<>();
-
-        for (var a : authorities) {
-            roleSet.add(new Authority("ROLE_" + a.getName()));
+    public Set<SimpleGrantedAuthority> getAuthorities() {
+        Set<SimpleGrantedAuthority> authorities = new HashSet<>();
+        for (Role role : roles) {
+            for (Authority authority : role.getAuthorities()) {
+                authorities.add(new SimpleGrantedAuthority(authority.getName()));
+            }
         }
-        return roleSet;
+        return authorities;
     }
-
 
     @Override
     public String getUsername() {
         return this.email;
     }
-
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(
-            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
-    )
-    private Set<Role> roles;
-
-
 }

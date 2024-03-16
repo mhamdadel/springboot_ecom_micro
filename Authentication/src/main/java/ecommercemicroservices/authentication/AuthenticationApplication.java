@@ -12,7 +12,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import ecommercemicroservices.authentication.config.RsaKeyConfigProperties;
+import ecommercemicroservices.authentication.config.Jwt.RsaKeyConfigProperties;
 
 @SpringBootApplication
 @ComponentScan(value = { "ecommercemicroservices.authentication.*" })

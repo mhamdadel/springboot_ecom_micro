@@ -1,42 +1,23 @@
 package ecommercemicroservices.authentication.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.util.Assert;
 
 import java.util.Set;
 
 @Entity
-// @Table(name = "users_authorities")
+@Table(name = "auth_authorities")
 @Data
-public class Authority implements GrantedAuthority {
-
-    private static final long serialVersionUID = 620L;
-
+public class Authority {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
 
-    private String role;
-
-    @ManyToMany(mappedBy = "authorities")
-    private Set<CustomUser> users;
-
-
-    public Authority(String role) {
-        Assert.hasText(role, "A granted authority textual representation is required");
-        this.role = role;
-    }
-
-    public Authority() {
-
-    }
-
-    public String getAuthority() {
-        return this.role;
-    }
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "authorities")
+    @JsonIgnore
+    private Set<Role> roles;
 
 }

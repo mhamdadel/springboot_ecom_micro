@@ -3,7 +3,7 @@ package ecommercemicroservices.authentication.controller;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
-import ecommercemicroservices.authentication.config.RsaKeyConfigProperties;
+import ecommercemicroservices.authentication.config.Jwt.RsaKeyConfigProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/sso-auth-server")
+@RequestMapping("api")
 public class JwkSetRestController {
 
     @Autowired
@@ -22,7 +22,6 @@ public class JwkSetRestController {
     @GetMapping("/.well-known/jwks.json")
     public JWKSet keys() {
         RSAKey rsaKey = new RSAKey.Builder(rsaKeyConfigProperties.publicKey())
-                .keyID("1")
                 .build();
 
         List<JWK> jwkList = Collections.singletonList(rsaKey);

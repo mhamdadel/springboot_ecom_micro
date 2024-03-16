@@ -1,4 +1,4 @@
-package ecommercemicroservices.authentication.config;
+package ecommercemicroservices.authentication.config.Jwt;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

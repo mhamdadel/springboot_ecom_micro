@@ -7,6 +7,7 @@ import ecommercemicroservices.authentication.dto.response.RegisterRes;
 import ecommercemicroservices.authentication.error.exceptions.UnauthorizedException;
 import ecommercemicroservices.authentication.model.CustomUser;
 import ecommercemicroservices.authentication.service.AuthService;
+import ecommercemicroservices.authentication.service.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +28,14 @@ public class AuthController {
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
     private final AuthService authService;
+    private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
     @Autowired
-    public AuthController(AuthService authService, AuthenticationManager authenticationManager) {
+    public AuthController(AuthService authService, AuthenticationManager authenticationManager, JwtService jwtService) {
         this.authService = authService;
         this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
     }
 
     @PostMapping("/login")
@@ -48,7 +51,7 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             log.info("Token requested for user :{}", authentication.getAuthorities());
-            String token = authService.generateToken(authentication);
+            String token = jwtService.generateToken(authentication);
 
             LoginRes response = new LoginRes(usernameOrEmail, token);
 
@@ -68,7 +71,7 @@ public class AuthController {
                     new UsernamePasswordAuthenticationToken(usernameOrEmail, registerReq.getPassword())
             );
 
-            String token = authService.generateToken(authentication);
+            String token = jwtService.generateToken(authentication);
 
             return ResponseEntity.ok(new RegisterRes(newUser.getEmail(), token));
         } catch (Exception e) {
