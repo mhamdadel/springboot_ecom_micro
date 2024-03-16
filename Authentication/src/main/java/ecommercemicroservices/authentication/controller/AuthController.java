@@ -1,5 +1,6 @@
 package ecommercemicroservices.authentication.controller;
 
+import ecommercemicroservices.authentication.dto.request.ChangePasswordRequest;
 import ecommercemicroservices.authentication.dto.request.LoginReq;
 import ecommercemicroservices.authentication.dto.request.RegisterReq;
 import ecommercemicroservices.authentication.dto.response.LoginRes;
@@ -16,11 +17,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api")
@@ -38,26 +37,24 @@ public class AuthController {
         this.jwtService = jwtService;
     }
 
+    @PatchMapping
+    public ResponseEntity<?> changePassword(
+            @RequestBody ChangePasswordRequest request,
+            Principal connectedUser
+    ) {
+        authService.changePassword(request, connectedUser);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginReq loginReq) {
+    public ResponseEntity<LoginRes> login(@RequestBody LoginReq loginReq) {
         try {
-            String usernameOrEmail = loginReq.getUsername() != null ? loginReq.getUsername() : loginReq.getEmail();
-            Authentication authentication =
-                    authenticationManager
-                            .authenticate(new UsernamePasswordAuthenticationToken(
-                                    usernameOrEmail,
-                                    loginReq.getPassword()));
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            log.info("Token requested for user :{}", authentication.getAuthorities());
-            String token = jwtService.generateToken(authentication);
-
-            LoginRes response = new LoginRes(usernameOrEmail, token);
-
+            LoginRes response = authService.login(loginReq);
             return ResponseEntity.ok(response);
         } catch (BadCredentialsException e) {
-            throw new UnauthorizedException("Invalid username or password" + e.getMessage());
+            throw new UnauthorizedException("Invalid username or password: " + e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException("Login failed: " + e.getMessage());
         }
     }
 
